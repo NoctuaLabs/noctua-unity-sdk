@@ -18,9 +18,8 @@ public class NoctuaGame {
         private static extern void trackPurchaseEvent(string orderId, double purchaseAmount, string currency, string parameters);
     #endif
 
-    private static AndroidJavaClass unityPlayer;
-    private static AndroidJavaObject currentActivity;
-    private static AndroidJavaClass noctua;
+    private static AndroidJavaClass _unityPlayer;
+    private static AndroidJavaObject _unityActivity;
     
     public static void Init(string productCode)
     {
@@ -32,14 +31,11 @@ public class NoctuaGame {
         #elif UNITY_ANDROID
                 if (Application.platform == RuntimePlatform.Android)
                 {
-                    unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-                    activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-                    noctua = new AndroidJavaObject("com.noctua.QuickSDKMethod");
-                    noctua.CallStatic("Init", activity, productCode);
+                    _unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+                    _unityActivity = _unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
                 }
         #endif
     }
-
 
     public static void TrackEvent(string eventName, Dictionary<string, string> parameters = null)
     {
@@ -59,11 +55,11 @@ public class NoctuaGame {
 #elif UNITY_ANDROID
                 if (Application.platform == RuntimePlatform.Android)
                 {
-                    if (noctua != null)
+                    if (_unityActivity != null)
                     {
                         if (parameters == null)
                         {
-                            noctua.CallStatic("trackEvent", eventName, null);
+                            _unityActivity.CallStatic("doTrackEvent", eventName, null);
                         }
                         else
                         {
@@ -71,8 +67,12 @@ public class NoctuaGame {
                             foreach (KeyValuePair<string, string> entry in parameters) {
                                 bundle.CallStatic("putString", entry.Key, entry.Value);
                             }
-                            noctua.CallStatic("trackEvent", eventName, bundle);
+                            _unityActivity.CallStatic("doTrackEvent", eventName, bundle);
                         }
+                    }
+                    else
+                    {
+                        Debug.LogError("Failed to get the current Unity activity.");
                     }
                 }
 #endif
@@ -95,11 +95,11 @@ public class NoctuaGame {
 #elif UNITY_ANDROID
                 if (Application.platform == RuntimePlatform.Android)
                 {
-                    if (noctua != null)
+                    if (_unityActivity != null)
                     {
                         if (parameters == null)
                         {
-                            noctua.CallStatic("trackPurchaseEvent", orderId, purchaseAmount, currency, null);
+                            _unityActivity.CallStatic("doTrackPurchaseEvent", orderId, purchaseAmount, currency, null);
                         }
                         else
                         {
@@ -107,8 +107,12 @@ public class NoctuaGame {
                             foreach (KeyValuePair<string, string> entry in parameters) {
                                 bundle.CallStatic("putString", entry.Key, entry.Value);
                             }
-                            noctua.CallStatic("trackPurchaseEvent", orderId, purchaseAmount, currency, bundle);
+                            _unityActivity.CallStatic("doTrackPurchaseEvent", orderId, purchaseAmount, currency, bundle);
                         }
+                    }
+                    else
+                    {
+                        Debug.LogError("Failed to get the current Unity activity.");
                     }
                 }
 #endif
