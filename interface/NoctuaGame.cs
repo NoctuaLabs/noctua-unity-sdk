@@ -65,7 +65,7 @@ public class NoctuaGame {
                         {
                             AndroidJavaObject bundle = new AndroidJavaObject("android.os.Bundle");
                             foreach (KeyValuePair<string, string> entry in parameters) {
-                                bundle.CallStatic("putString", entry.Key, entry.Value);
+                                bundle.Call("putString", entry.Key, entry.Value);
                             }
                             _unityActivity.CallStatic("doTrackEvent", eventName, bundle);
                         }
@@ -105,7 +105,7 @@ public class NoctuaGame {
                         {
                             AndroidJavaObject bundle = new AndroidJavaObject("android.os.Bundle");
                             foreach (KeyValuePair<string, string> entry in parameters) {
-                                bundle.CallStatic("putString", entry.Key, entry.Value);
+                                bundle.Call("putString", entry.Key, entry.Value);
                             }
                             _unityActivity.CallStatic("doTrackPurchaseEvent", orderId, purchaseAmount, currency, bundle);
                         }
